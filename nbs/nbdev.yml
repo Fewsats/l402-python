@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "l402-python"
+  site-url: "https://Fewsats.github.io/l402-python"
+  description: ""
+  repo-branch: main
+  repo-url: "https://github.com/Fewsats/l402-python"
