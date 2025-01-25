@@ -6,12 +6,14 @@
 __all__ = ['create_test_wallet', 'is_port_free', 'wait_port_free', 'ServerManager']
 
 # %% ../nbs/03_utils.ipynb 3
-def create_test_wallet(fund=True):
-    import os
-    from cdp import Cdp, Wallet
+import os
+from cdp import *
+
+# %% ../nbs/03_utils.ipynb 4
+def create_test_wallet(fund=True, chain='base-sepolia'):
     Cdp.configure(api_key_name=os.getenv("CDP_KEY_NAME"), private_key=os.getenv("CDP_PRIVATE_KEY"))
 
-    wallet = Wallet.create('base-sepolia')
+    wallet = Wallet.create(network_id=chain)
     if fund:    
         faucet_tx = wallet.faucet('usdc')
         faucet_tx.wait()
@@ -19,12 +21,12 @@ def create_test_wallet(fund=True):
         faucet_tx.wait()
     return wallet
 
-# %% ../nbs/03_utils.ipynb 5
+# %% ../nbs/03_utils.ipynb 6
 import asyncio, socket, time
 from threading import Thread
 import uvicorn
 
-# %% ../nbs/03_utils.ipynb 6
+# %% ../nbs/03_utils.ipynb 7
 def is_port_free(port, host='localhost'):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -54,3 +56,8 @@ class ServerManager:
             self.server.should_exit = True
             wait_port_free(self.server.config.port)
         return True
+
+# %% ../nbs/03_utils.ipynb 8
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+

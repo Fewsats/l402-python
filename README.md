@@ -97,7 +97,7 @@ c = Client(onchain_provider=CoinbaseProvider(wallet=w))
 ```
 
 ``` python
-r1 = httpx.get("http://localhost:8000/offers")
+r1 = httpx.get("http://localhost:9000/offers")
 r1.status_code, r1.json()
 ```
 
