@@ -20,7 +20,7 @@ import httpx
 from pydantic import BaseModel
 
 
-# %% ../nbs/01_payment_clients.ipynb 3
+# %% ../nbs/01_payment_clients.ipynb 4
 class PaymentProvider(ABC):
     """Base class for all payment providers"""
     supported_methods: list[str] = []  # Will be overridden by each provider
@@ -38,7 +38,7 @@ class PaymentRequest(BaseModel):
     asset: str = ""
 
 
-# %% ../nbs/01_payment_clients.ipynb 6
+# %% ../nbs/01_payment_clients.ipynb 7
 from cdp import *
 
 class CoinbaseProvider(fc.BasicRepr):
@@ -56,7 +56,7 @@ class CoinbaseProvider(fc.BasicRepr):
         # TODO, return a generic async task 
         return self.wallet.transfer(amount, asset, address).wait()
 
-# %% ../nbs/01_payment_clients.ipynb 11
+# %% ../nbs/01_payment_clients.ipynb 14
 def get_payment_request(payment_request_url: str,
                         payment_context_token: str,
                         offer_id: str, 
@@ -75,29 +75,33 @@ def get_payment_request(payment_request_url: str,
     return r.json()
 
 
-# %% ../nbs/01_payment_clients.ipynb 13
+# %% ../nbs/01_payment_clients.ipynb 17
 class Client(fc.BasicRepr):
     def __init__(self, lightning_provider = None, 
                  credit_card_provider = None, 
-                 onchain_provider = None):
+                 onchain_provider = None,
+                 fewsats_provider = None):
         store_attr()
         self.lightning_provider = lightning_provider
         self.credit_card_provider = credit_card_provider
         self.onchain_provider = onchain_provider
+        self.fewsats_provider = fewsats_provider
 
 
-    def pay(self, ofr: dict): # ofr is the l402 offers response dictionary
+    def pay(self, ofr_body: dict): # ofr is the l402 offers response dictionary
         "Pay for an offer"
         # this actually does 3 things
         # 1. Selects offer
         # 2. Gets payment request details
         # 3. Uses user-provided payment method
         
-        ofr = L402Response(**ofr)
+        ofr = L402Response(**ofr_body)
         if len(ofr.offers) != 1: raise ValueError("Only one offer is supported")
         o = first(ofr.offers)
 
-        if 'onchain' in o.payment_methods and self.onchain_provider:
+        if self.fewsats_provider:
+            return self.fewsats_provider.pay(ofr_body)
+        elif 'onchain' in o.payment_methods and self.onchain_provider:
             r = get_payment_request(ofr.payment_request_url, ofr.payment_context_token, o.offer_id, 'onchain', self.onchain_provider.chain, self.onchain_provider.asset)
 
             return self.onchain_provider.pay(o.amount, r['payment_request']['address'], r['payment_request']['asset'])
@@ -108,7 +112,7 @@ class Client(fc.BasicRepr):
             raise ValueError(f"No payment provider available for {ofr.offers[0].payment_methods}")
 
 
-# %% ../nbs/01_payment_clients.ipynb 16
+# %% ../nbs/01_payment_clients.ipynb 20
 # class PaymentStatus:
 #     PENDING = "pending"
 #     COMPLETED = "completed"
@@ -154,7 +158,7 @@ class Fewsats:
         print(self.api_key)
         return self._request("POST", "v0/l402/purchases/from-offer", json=data)
 
-# %% ../nbs/01_payment_clients.ipynb 19
+# %% ../nbs/01_payment_clients.ipynb 25
 @patch
 def _pay_onchain(self: Fewsats, address: str,
                     amount: str,
@@ -166,5 +170,6 @@ def _pay_onchain(self: Fewsats, address: str,
         "chain": chain,
         "asset": asset,
     }
+    print(data)
     return self._request("POST", "v0/l402/purchases/onchain", json=data)
 

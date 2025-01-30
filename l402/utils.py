@@ -13,7 +13,7 @@ from cdp import *
 def create_test_wallet(fund=True, chain='base-sepolia'):
     Cdp.configure(api_key_name=os.getenv("CDP_KEY_NAME"), private_key=os.getenv("CDP_PRIVATE_KEY"))
 
-    wallet = Wallet.create(network_id=chain)
+    wallet = Wallet.create(chain)
     if fund:    
         faucet_tx = wallet.faucet('usdc')
         faucet_tx.wait()

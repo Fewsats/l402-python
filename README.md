@@ -146,7 +146,7 @@ offers_data = dict2obj(offers_data)
 data = {
     "offer_id": offers_data.offers[0].offer_id, 
     "payment_method": 'onchain',
-    "chain": 'base-mainnet', # choose the chain where you want to pay
+    "chain": 'base-sepolia', # choose the chain where you want to pay
     "asset": 'usdc', # choose the asset you want to pay
     "payment_context_token": offers_data.payment_context_token 
 }

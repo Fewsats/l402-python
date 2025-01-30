@@ -2,8 +2,8 @@ project:
   output-dir: _docs
 
 website:
-  title: "l402-python"
+  title: "l402"
   site-url: "https://Fewsats.github.io/l402-python"
-  description: ""
+  description: "Payments for AI agents using L402 protocol"
   repo-branch: main
   repo-url: "https://github.com/Fewsats/l402-python"

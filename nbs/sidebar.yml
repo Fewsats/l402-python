@@ -1,0 +1,9 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - 00_payment_providers.ipynb
+      - 01_payment_clients.ipynb
+      - 02_config.ipynb
+      - 03_utils.ipynb
+      - coinbase-test.ipynb

@@ -34,7 +34,7 @@ class OfferRow:
     version:str
     created_at:str
 
-offers = db.create(OfferRow, name='offers', pk='offer_id')
+offers = db.create(OfferRow, name='offers', pk='offer_id', if_not_exists=True)
 
 class PaymentRequestRow: 
     id:int
@@ -46,7 +46,7 @@ class PaymentRequestRow:
     version:str
     created_at:str
 
-payment_requests = db.create(PaymentRequestRow, name='payment_requests', pk='id')
+payment_requests = db.create(PaymentRequestRow, name='payment_requests', pk='id', if_not_exists=True)
 
 
 
